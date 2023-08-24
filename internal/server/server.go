@@ -23,14 +23,17 @@ import (
 	"io"
 	"net"
 	"os/exec"
+	"path/filepath"
 
 	"github.com/crossplane/function-runtime-exec/internal/proto/v1beta1"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/encoding/protojson"
 	"k8s.io/apimachinery/pkg/util/json"
 
+	"github.com/crossplane/crossplane-runtime/pkg/certificates"
 	"github.com/crossplane/crossplane-runtime/pkg/logging"
 )
 
@@ -41,7 +44,9 @@ type Runner struct {
 	v1beta1.UnimplementedFunctionRunnerServiceServer
 	command string
 	args    []string
-	log     logging.Logger
+
+	log       logging.Logger
+	certsPath string
 }
 
 // RunnerOpts are options for a Runner.
@@ -51,6 +56,14 @@ type RunnerOpts func(*Runner)
 func WithLogger(l logging.Logger) RunnerOpts {
 	return func(r *Runner) {
 		r.log = l
+	}
+}
+
+// WithServerTLSCertPath configures the supplied Runner to use the supplied
+// server TLS certificate path.
+func WithServerTLSCertPath(p string) RunnerOpts {
+	return func(r *Runner) {
+		r.certsPath = p
 	}
 }
 
@@ -125,8 +138,16 @@ func (r *Runner) ListenAndServe(network, address string) error {
 		return errors.Wrapf(err, "while trying to listen on network: %s, address: %s", network, address)
 	}
 
+	var opts []grpc.ServerOption
+	if r.certsPath != "" {
+		tlsConfig, err := certificates.LoadMTLSConfig(filepath.Join(r.certsPath, "ca.crt"), filepath.Join(r.certsPath, "tls.crt"), filepath.Join(r.certsPath, "tls.key"), true)
+		if err != nil {
+			return errors.Wrap(err, "while loading mTLS config")
+		}
+		opts = append(opts, grpc.Creds(credentials.NewTLS(tlsConfig)))
+	}
 	// TODO(negz): Limit concurrent function runs?
-	srv := grpc.NewServer()
+	srv := grpc.NewServer(opts...)
 	reflection.Register(srv)
 	v1beta1.RegisterFunctionRunnerServiceServer(srv, r)
 	return errors.Wrap(srv.Serve(lis), "while running grpc server")

@@ -29,8 +29,9 @@ import (
 type Command struct {
 	Args []string `arg:""`
 
-	Network string `help:"Network on which to listen for gRPC connections." default:"tcp"`
-	Address string `help:"Address at which to listen for gRPC connections." default:"0.0.0.0:1234"`
+	Network           string `help:"Network on which to listen for gRPC connections." default:"tcp"`
+	Address           string `help:"Address at which to listen for gRPC connections." default:"0.0.0.0:1234"`
+	TLSServerCertsDir string `help:"Folder containing server certs (tls.key, tls.crt) and the CA used to verify client certificates (ca.crt)" env:"TLS_SERVER_CERTS_DIR"`
 }
 
 // Run a Composition Function gRPC API.
@@ -39,6 +40,6 @@ func (c *Command) Run(log logging.Logger) error {
 	if len(c.Args) < 1 {
 		return errors.Errorf("at least one argument is required")
 	}
-	f := server.NewRunner(c.Args[0], c.Args[1:], server.WithLogger(log))
+	f := server.NewRunner(c.Args[0], c.Args[1:], server.WithLogger(log), server.WithServerTLSCertPath(c.TLSServerCertsDir))
 	return errors.Wrap(f.ListenAndServe(c.Network, c.Address), "cannot listen for and serve gRPC API")
 }
