@@ -1,0 +1,15 @@
+---
+apiVersion: meta.pkg.crossplane.io/v1alpha1
+kind: Function
+metadata:
+  name: function-jq
+  annotations:
+    # meta.crossplane.io/maintainer: Upbound <support@upbound.io>
+    # meta.crossplane.io/source: 
+    # meta.crossplane.io/license: Apache-2.0
+    # meta.crossplane.io/description: |
+    # meta.crossplane.io/readme: |
+spec:
+  crossplane:
+    version: ">=v1.13.1"
+  dependsOn: []

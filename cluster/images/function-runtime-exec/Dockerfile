@@ -11,7 +11,7 @@ ARG TARGETARCH
 # time.
 RUN apt-get update && apt-get install -y ca-certificates crun && rm -rf /var/lib/apt/lists/*
 
-COPY bin/${TARGETOS}\_${TARGETARCH}/function-runtime-oci /usr/local/bin/
+COPY bin/${TARGETOS}\_${TARGETARCH}/function-runtime-exec /usr/local/bin/
 
 # We run xfn as root in order to grant it CAP_SETUID and CAP_SETGID, which are
 # required in order to create a user namespace with more than one available UID
@@ -25,4 +25,4 @@ COPY bin/${TARGETOS}\_${TARGETARCH}/function-runtime-oci /usr/local/bin/
 # that don't run as root may not work.
 # USER 65532
 
-ENTRYPOINT ["function-runtime-oci"]
+ENTRYPOINT ["function-runtime-exec"]

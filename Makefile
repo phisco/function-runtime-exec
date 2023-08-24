@@ -41,6 +41,11 @@ IMAGES = function-runtime-exec
 -include build/makelib/imagelight.mk
 
 # ====================================================================================
+# Setup xpkg
+
+-include ../../../build/makelib/xpkg.mk
+
+# ====================================================================================
 # Targets
 
 # run `make help` to see the targets and options
