@@ -30,7 +30,7 @@ type Command struct {
 	Args []string `arg:""`
 
 	Network           string `help:"Network on which to listen for gRPC connections." default:"tcp"`
-	Address           string `help:"Address at which to listen for gRPC connections." default:"0.0.0.0:1234"`
+	Address           string `help:"Address at which to listen for gRPC connections." default:"0.0.0.0:9443"`
 	TLSServerCertsDir string `help:"Folder containing server certs (tls.key, tls.crt) and the CA used to verify client certificates (ca.crt)" env:"TLS_SERVER_CERTS_DIR"`
 }
 

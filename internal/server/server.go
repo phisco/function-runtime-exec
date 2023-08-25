@@ -132,7 +132,7 @@ func (r *Runner) RunFunction(ctx context.Context, req *v1beta1.RunFunctionReques
 
 // ListenAndServe gRPC connections at the supplied address.
 func (r *Runner) ListenAndServe(network, address string) error {
-	r.log.Debug("Listening", "network", network, "address", address, "command", r.command, "args", r.args)
+	r.log.Debug("Listening", "network", network, "address", address, "command", r.command, "args", r.args, "certsPath", r.certsPath)
 	lis, err := net.Listen(network, address)
 	if err != nil {
 		return errors.Wrapf(err, "while trying to listen on network: %s, address: %s", network, address)
